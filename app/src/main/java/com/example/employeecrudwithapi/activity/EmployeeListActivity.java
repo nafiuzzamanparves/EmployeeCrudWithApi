@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -42,6 +43,10 @@ public class EmployeeListActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        // Enable the Up button (back arrow) in the ActionBar
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
         employeeAdapter = new EmployeeAdapter(employeeList);
         recyclerView = findViewById(R.id.employeeRecyclerView);
@@ -49,6 +54,12 @@ public class EmployeeListActivity extends AppCompatActivity {
         recyclerView.setAdapter(employeeAdapter);
 
         fetchEmployees();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
     private void fetchEmployees() {
@@ -60,9 +71,9 @@ public class EmployeeListActivity extends AppCompatActivity {
         ApiService apiService = retrofit.create(ApiService.class);
         Call<List<Employee>> call = apiService.getAllEmployee();
 
-        call.enqueue(new Callback<List<Employee>>() {
+        call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<List<Employee>> call, Response<List<Employee>> response) {
+            public void onResponse(@NonNull Call<List<Employee>> call, @NonNull Response<List<Employee>> response) {
                 if (response.isSuccessful()) {
                     List<Employee> employees = response.body();
                     assert employees != null;
@@ -79,7 +90,7 @@ public class EmployeeListActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Employee>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Employee>> call, @NonNull Throwable t) {
                 Log.e(TAG, "API Call Failed: " + t.getMessage());
             }
         });

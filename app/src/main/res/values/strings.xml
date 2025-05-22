@@ -15,4 +15,5 @@
     <string name="update">Update</string>
     <string name="delete">Delete</string>
     <string name="list_page">List Page</string>
+    <string name="add_employee">Add Employee</string>
 </resources>
