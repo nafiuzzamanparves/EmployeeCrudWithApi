@@ -8,11 +8,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employeecrudwithapi.R;
+import com.example.employeecrudwithapi.adapter.EmployeeAdapter;
 import com.example.employeecrudwithapi.model.Employee;
 import com.example.employeecrudwithapi.service.ApiService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -24,6 +28,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class EmployeeListActivity extends AppCompatActivity {
 
     private static final String TAG = "EmployeeListActivity";
+    private RecyclerView recyclerView;
+    private EmployeeAdapter employeeAdapter;
+    private List<Employee> employeeList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +42,11 @@ public class EmployeeListActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        employeeAdapter = new EmployeeAdapter(employeeList);
+        recyclerView = findViewById(R.id.employeeRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(employeeAdapter);
 
         fetchEmployees();
     }
@@ -58,6 +70,9 @@ public class EmployeeListActivity extends AppCompatActivity {
                         Log.d(TAG, "ID: " + emp.getId() + ", Name: "
                                 + emp.getName() + ", Designation: " + emp.getDesignation());
                     }
+                    employeeList.clear();
+                    employeeList.addAll(employees);
+                    employeeAdapter.notifyDataSetChanged();
                 } else {
                     Log.e(TAG, "API Response Error: " + response.code());
                 }

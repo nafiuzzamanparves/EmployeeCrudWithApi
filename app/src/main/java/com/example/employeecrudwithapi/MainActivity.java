@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private TextInputEditText editTextDob;
     private TextInputLayout dateLayout;
     private EditText textName, textEmail, textDesignation, numberAge, multilineAddress, decimalSalary;
-    private Button btnSave;
+    private Button btnSave, btnListPage;
     private ApiService apiService;
 
     @Override
@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         multilineAddress = findViewById(R.id.multilineAddress);
         decimalSalary = findViewById(R.id.decimalSalary);
         btnSave = findViewById(R.id.btnSave);
+        btnListPage = findViewById(R.id.btnListPage);
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://10.0.2.2:8081/") // for emulator
@@ -70,6 +71,13 @@ public class MainActivity extends AppCompatActivity {
         dateLayout.setEndIconOnClickListener(v -> showDatePicker());
 
         btnSave.setOnClickListener(v -> saveEmployee());
+        btnListPage.setOnClickListener(v -> navigateToEmployeeListPage());
+    }
+
+    private void navigateToEmployeeListPage() {
+        Intent intent = new Intent(MainActivity.this, EmployeeListActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showDatePicker() {

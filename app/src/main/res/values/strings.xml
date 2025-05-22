@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">EmployeeCrudWithApi</string>
+
+    <!--Employee-->
+    <string name="name">Name</string>
+    <string name="email">Email</string>
+    <string name="designation">Designation</string>
+    <string name="age">Age</string>
+    <string name="address">Address</string>
+    <string name="dob">Date of Birth</string>
+    <string name="salary">Salary</string>
+
+    <!--Buttons-->
+    <string name="save">Save</string>
+    <string name="update">Update</string>
+    <string name="delete">Delete</string>
+    <string name="list_page">List Page</string>
 </resources>
