@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,6 +17,8 @@ import com.example.employeecrudwithapi.R;
 import com.example.employeecrudwithapi.adapter.EmployeeAdapter;
 import com.example.employeecrudwithapi.model.Employee;
 import com.example.employeecrudwithapi.service.ApiService;
+import com.example.employeecrudwithapi.util.ApiClient;
+import com.example.employeecrudwithapi.util.EmployeeDiffCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +26,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class EmployeeListActivity extends AppCompatActivity {
 
@@ -48,7 +49,7 @@ public class EmployeeListActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        employeeAdapter = new EmployeeAdapter(employeeList);
+        employeeAdapter = new EmployeeAdapter(this, employeeList);
         recyclerView = findViewById(R.id.employeeRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(employeeAdapter);
@@ -63,12 +64,7 @@ public class EmployeeListActivity extends AppCompatActivity {
     }
 
     private void fetchEmployees() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8081/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        ApiService apiService = retrofit.create(ApiService.class);
+        ApiService apiService = ApiClient.getApiService();
         Call<List<Employee>> call = apiService.getAllEmployee();
 
         call.enqueue(new Callback<>() {
@@ -81,9 +77,13 @@ public class EmployeeListActivity extends AppCompatActivity {
                         Log.d(TAG, "ID: " + emp.getId() + ", Name: "
                                 + emp.getName() + ", Designation: " + emp.getDesignation());
                     }
+                    DiffUtil.DiffResult result = DiffUtil.calculateDiff(new EmployeeDiffCallback(employeeList, employees));
                     employeeList.clear();
                     employeeList.addAll(employees);
-                    employeeAdapter.notifyDataSetChanged();
+                    // The below code does change the whole content of the RecyclerView which is inefficient
+                    // employeeAdapter.notifyDataSetChanged();
+                    // Rather use this one
+                    result.dispatchUpdatesTo(employeeAdapter);
                 } else {
                     Log.e(TAG, "API Response Error: " + response.code());
                 }

@@ -17,8 +17,10 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.employeecrudwithapi.R;
 import com.example.employeecrudwithapi.model.Employee;
 import com.example.employeecrudwithapi.service.ApiService;
+import com.example.employeecrudwithapi.util.ApiClient;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -35,7 +37,9 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private TextInputLayout dateLayout;
     private EditText textName, textEmail, textDesignation, numberAge, multilineAddress, decimalSalary;
     private Button btnSave;
-    private ApiService apiService;
+    private ApiService apiService = ApiClient.getApiService();
+    private boolean isEditMode = false;
+    private int employeeId = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +66,27 @@ public class AddEmployeeActivity extends AppCompatActivity {
         decimalSalary = findViewById(R.id.decimalSalary);
         btnSave = findViewById(R.id.btnSave);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:8081/") // for emulator
-                // .baseUrl("http://172.28.64.1:8081/") // Give you computers IP
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+        Intent intent = getIntent();
+        if (getIntent().hasExtra("employee")) {
+            Employee employee = new Gson()
+                    .fromJson(intent.getStringExtra("employee"), Employee.class);
+            employeeId = employee.getId();
 
-        apiService = retrofit.create(ApiService.class);
+            textName.setText(employee.getName());
+            textEmail.setText(employee.getEmail());
+            textDesignation.setText(employee.getDesignation());
+            numberAge.setText(String.valueOf(employee.getAge()));
+            multilineAddress.setText(employee.getAddress());
+            editTextDob.setText(employee.getDob());
+            decimalSalary.setText(String.valueOf(employee.getSalary()));
 
+            btnSave.setText(R.string.update);
+            isEditMode = true;
+        }
+
+        btnSave.setOnClickListener(v -> saveOrUpdateEmployee());
         dateLayout.setEndIconOnClickListener(v -> showDatePicker());
 
-        btnSave.setOnClickListener(v -> saveEmployee());
     }
 
     @Override
@@ -87,16 +101,20 @@ public class AddEmployeeActivity extends AppCompatActivity {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog picker = new DatePickerDialog(this,
+        DatePickerDialog picker = new DatePickerDialog(
+                this,
                 (view, year1, month1, day1) -> {
                     String dob = String.format(Locale.US, "%04d-%02d-%02d", year1, month1, day1);
                     editTextDob.setText(dob);
                 },
-                year, month, day);
+                year,
+                month,
+                day
+        );
         picker.show();
     }
 
-    private void saveEmployee() {
+    private void saveOrUpdateEmployee() {
         String name = textName.getText().toString().trim();
         String email = textEmail.getText().toString().trim();
         String designation = textDesignation.getText().toString().trim();
@@ -106,8 +124,10 @@ public class AddEmployeeActivity extends AppCompatActivity {
         String dobString = editTextDob.getText().toString().trim();
         double salary = Double.parseDouble(decimalSalary.getText().toString().trim());
 
-        // Create Employee object
         Employee employee = new Employee();
+        if (isEditMode) {
+            employee.setId(employeeId);
+        }
         employee.setName(name);
         employee.setEmail(email);
         employee.setDesignation(designation);
@@ -116,16 +136,24 @@ public class AddEmployeeActivity extends AppCompatActivity {
         employee.setDob(dobString);
         employee.setSalary(salary);
 
-        // Make API call
-        Call<Employee> call = apiService.saveEmployee(employee);
-        String string = call.toString();
-        System.out.println(string);
+        Call<Employee> call;
+        if (isEditMode) {
+            call = apiService.updateEmployee(employeeId, employee);
+        } else {
+            call = apiService.saveEmployee(employee);
+        }
+
         call.enqueue(new Callback<>() {
             @Override
             public void onResponse(@NonNull Call<Employee> call, @NonNull Response<Employee> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(AddEmployeeActivity.this, "Employee saved successfully!",
-                            Toast.LENGTH_SHORT).show();
+                    String message;
+                    if (isEditMode)
+                        message = "Employee Updated Successfully!";
+                    else
+                        message = "Employee Saved Successfully!";
+
+                    Toast.makeText(AddEmployeeActivity.this, message, Toast.LENGTH_SHORT).show();
                     clearForm();
                     Intent intent = new Intent(AddEmployeeActivity.this, EmployeeListActivity.class);
                     startActivity(intent);
