@@ -18,11 +18,14 @@ import com.example.employeecrudwithapi.R;
 import com.example.employeecrudwithapi.model.Employee;
 import com.example.employeecrudwithapi.service.ApiService;
 import com.example.employeecrudwithapi.util.ApiClient;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -85,8 +88,8 @@ public class AddEmployeeActivity extends AppCompatActivity {
         }
 
         btnSave.setOnClickListener(v -> saveOrUpdateEmployee());
-        dateLayout.setEndIconOnClickListener(v -> showDatePicker());
-
+        // dateLayout.setEndIconOnClickListener(v -> showDatePicker());
+        dateLayout.setEndIconOnClickListener(v -> showMaterialDatePicker());
     }
 
     @Override
@@ -95,6 +98,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         return true;
     }
 
+    // Not so good with year picking
     private void showDatePicker() {
         final Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
@@ -113,6 +117,24 @@ public class AddEmployeeActivity extends AppCompatActivity {
         );
         picker.show();
     }
+
+    // More moder date picker for material
+    private void showMaterialDatePicker() {
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Date of Birth")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build();
+
+        datePicker.show(getSupportFragmentManager(), "DOB_PICKER");
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            // Convert selected timestamp to yyyy-MM-dd
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            String dob = sdf.format(new Date(selection));
+            editTextDob.setText(dob);
+        });
+    }
+
 
     private void saveOrUpdateEmployee() {
         String name = textName.getText().toString().trim();
