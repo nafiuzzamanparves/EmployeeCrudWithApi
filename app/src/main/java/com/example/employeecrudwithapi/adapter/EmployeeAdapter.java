@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,7 +103,7 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
     public static class EmployeeViewHolder extends RecyclerView.ViewHolder {
         TextView nameText, emailText, designationText;
-        Button updateButton, deleteButton;
+        ImageButton updateButton, deleteButton;
 
         public EmployeeViewHolder(@NonNull View itemView) {
             super(itemView);
