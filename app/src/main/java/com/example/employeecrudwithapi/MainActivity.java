@@ -1,19 +1,29 @@
 package com.example.employeecrudwithapi;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.employeecrudwithapi.activity.AddEmployeeActivity;
-import com.example.employeecrudwithapi.activity.EmployeeListActivity;
+import com.example.employeecrudwithapi.service.MyBackgroundService;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "MainActivity";
+    public static final String CUSTOM_BROADCAST_ACTION = "com.example.employeecrudwithapi.CUSTOM_ACTION";
+    private BroadcastReceiver myReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,21 +36,55 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        Button btnAddEmployee = findViewById(R.id.btnAddEmployee);
-        Button btnListEmployee = findViewById(R.id.btnListEmployee);
+        Button startServiceButton = findViewById(R.id.start_service_button);
+        Button stopServiceButton = findViewById(R.id.stop_service_button);
+        Button sendBroadcastButton = findViewById(R.id.send_broadcast_button);
 
-        btnAddEmployee.setOnClickListener(v -> navigateToAddEmployeePage());
-        btnListEmployee.setOnClickListener(v -> navigateToEmployeeListPage());
+        myReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (CUSTOM_BROADCAST_ACTION.equals(intent.getAction())) {
+                    String message = intent.getStringExtra("message");
+                    Toast.makeText(context, "Broadcast Received: " + message, Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Custom Broadcast received: " + message);
+                }
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(myReceiver, new IntentFilter(CUSTOM_BROADCAST_ACTION));
+
+        startServiceButton.setOnClickListener(v -> {
+            Intent serviceIntent = new Intent(MainActivity.this, MyBackgroundService.class);
+            startService(serviceIntent);
+            Toast.makeText(MainActivity.this, "Service Started", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Attempting to start MyBackgroundService");
+        });
+
+        stopServiceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent serviceIntent = new Intent(MainActivity.this, MyBackgroundService.class);
+                stopService(serviceIntent);
+                Toast.makeText(MainActivity.this, "Service Stopped", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Attempting to stop MyBackgroundService");
+            }
+        });
+
+        sendBroadcastButton.setOnClickListener(v -> {
+            Intent broadcastIntent = new Intent(CUSTOM_BROADCAST_ACTION);
+            broadcastIntent.putExtra("message", "Hello from MainActivity!");
+
+            LocalBroadcastManager.getInstance(MainActivity.this).sendBroadcast(broadcastIntent);
+            Toast.makeText(MainActivity.this, "Custom Broadcast Sent", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "Custom Broadcast sent from MainActivity");
+        });
     }
 
-    private void navigateToAddEmployeePage() {
-        Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
-        startActivity(intent);
-    }
-
-    private void navigateToEmployeeListPage() {
-        Intent intent = new Intent(MainActivity.this, EmployeeListActivity.class);
-        startActivity(intent);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(myReceiver);
+        Log.d(TAG, "MainActivity destroyed, BroadcastReceiver unregistered.");
     }
 
 }
