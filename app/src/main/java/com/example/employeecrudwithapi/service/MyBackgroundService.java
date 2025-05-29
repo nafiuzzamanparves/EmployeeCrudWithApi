@@ -31,7 +31,8 @@ public class MyBackgroundService extends Service {
                 Log.d(TAG, "Service running... Counter: " + counter);
                 // You could perform some background task here, e.g., fetch data, update UI via broadcast
                 // For demonstration, we'll just log and show a toast (though toasts from services should be used sparingly)
-                Toast.makeText(MyBackgroundService.this, "Service running: " + counter, Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyBackgroundService.this,
+                        "Service running: " + counter, Toast.LENGTH_SHORT).show();
                 handler.postDelayed(this, 5000); // Repeat every 5 seconds
             }
         };
@@ -42,7 +43,6 @@ public class MyBackgroundService extends Service {
         Log.d(TAG, "Service Started Command");
         Toast.makeText(this, "Service Started Command", Toast.LENGTH_SHORT).show();
 
-        // Start the periodic task when the service starts
         handler.post(runnable);
 
         // Return START_STICKY to indicate that if the system kills the service,

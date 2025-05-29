@@ -11,22 +11,22 @@
 
     <Button
         android:id="@+id/start_service_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="Start Service" />
+        android:text="@string/start_service" />
 
     <Button
         android:id="@+id/stop_service_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:text="Stop Service" />
+        android:text="@string/stop_service" />
 
     <Button
         android:id="@+id/send_broadcast_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Send Custom Broadcast" />
+        android:text="@string/send_custom_broadcast" />
 
 </LinearLayout>

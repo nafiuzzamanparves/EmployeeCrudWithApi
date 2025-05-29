@@ -16,4 +16,7 @@
     <string name="delete">Delete</string>
     <string name="list_page">List Page</string>
     <string name="add_employee">Add Employee</string>
+    <string name="start_service">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="send_custom_broadcast">Send Custom Broadcast</string>
 </resources>
