@@ -19,4 +19,6 @@
     <string name="start_service">Start Service</string>
     <string name="stop_service">Stop Service</string>
     <string name="send_custom_broadcast">Send Custom Broadcast</string>
+    <string name="go_to_list_view_activity">Go to List View Activity</string>
+    <string name="go_to_grid_view_activity">Go to Grid View Activity</string>
 </resources>

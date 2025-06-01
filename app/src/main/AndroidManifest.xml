@@ -14,9 +14,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <service
-            android:name=".service.MyBackgroundService"
-            android:enabled="true"
+        <activity
+            android:name=".activity.SearchableListViewActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.SearchableGridViewActivity"
             android:exported="false" />
 
         <activity
